@@ -1,0 +1,103 @@
+import 'package:flutter/material.dart';
+import 'login.dart';
+
+class RegisterScreen extends StatefulWidget {
+  @override
+  _RegisterScreenState createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _noHPController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  String _errorMessage = '';
+
+  void _register() {
+    String name = _nameController.text;
+    String email = _emailController.text;
+    String noHP = _noHPController.text;
+    String password = _passwordController.text;
+    String confirmPassword = _confirmPasswordController.text;
+
+    // Validasi input
+    if (name.isEmpty || email.isEmpty || noHP.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      setState(() {
+        _errorMessage = 'Harap isi semua data';
+      });
+    } else if (password != confirmPassword) {
+      setState(() {
+        _errorMessage = 'Password dan Konfirmasi Password tidak cocok';
+      });
+    } else {
+      // Jika berhasil, arahkan ke halaman login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('DAFTAR', style: TextStyle(fontSize: 25, color: Colors.white)),
+        backgroundColor: const Color(0xFF61AB32),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView( // Ensures content is scrollable only if necessary
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SizedBox(height: 10),
+              Align(
+                alignment: Alignment.topCenter,
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  height: 250,
+                ),
+              ),
+              SizedBox(height: 50),
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(labelText: 'Nama Lengkap'),
+              ),
+              TextField(
+                controller: _emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+              ),
+              TextField(
+                controller: _noHPController,
+                decoration: InputDecoration(labelText: 'No Handphone'),
+              ),
+              TextField(
+                controller: _passwordController,
+                decoration: InputDecoration(labelText: 'Password'),
+                obscureText: true,
+              ),
+              TextField(
+                controller: _confirmPasswordController,
+                decoration: InputDecoration(labelText: 'Konfirmasi Password'),
+                obscureText: true,
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _register,
+                child: Text('Daftar'),
+              ),
+              SizedBox(height: 10),
+              Text(
+                _errorMessage,
+                style: TextStyle(color: Colors.red),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
