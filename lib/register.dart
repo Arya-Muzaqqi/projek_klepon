@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Authentication
 import 'login.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -14,7 +15,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _confirmPasswordController = TextEditingController();
   String _errorMessage = '';
 
-  void _register() {
+  // Fungsi untuk melakukan pendaftaran ke Firebase
+  void _register() async {
     String name = _nameController.text;
     String email = _emailController.text;
     String noHP = _noHPController.text;
@@ -31,11 +33,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _errorMessage = 'Password dan Konfirmasi Password tidak cocok';
       });
     } else {
-      // Jika berhasil, arahkan ke halaman login
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
-      );
+      try {
+        // Daftarkan pengguna menggunakan Firebase Authentication
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        // Setelah berhasil, arahkan pengguna ke halaman login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      } on FirebaseAuthException catch (e) {
+        // Tangani error yang terjadi saat mendaftar
+        if (e.code == 'weak-password') {
+          setState(() {
+            _errorMessage = 'Password terlalu lemah.';
+          });
+        } else if (e.code == 'email-already-in-use') {
+          setState(() {
+            _errorMessage = 'Email sudah digunakan.';
+          });
+        } else {
+          setState(() {
+            _errorMessage = 'Terjadi kesalahan. Coba lagi nanti.';
+          });
+        }
+      } catch (e) {
+        setState(() {
+          _errorMessage = 'Terjadi kesalahan. Coba lagi nanti.';
+        });
+      }
     }
   }
 
@@ -47,7 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         backgroundColor: const Color(0xFF61AB32),
         centerTitle: true,
       ),
-      body: SingleChildScrollView( // Ensures content is scrollable only if necessary
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(

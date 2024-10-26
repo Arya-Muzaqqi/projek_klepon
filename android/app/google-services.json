@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "237423924221",
+    "project_id": "projek-klepon",
+    "storage_bucket": "projek-klepon.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:237423924221:android:d89683d8883fcbf6f3ff94",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfmpUUAqUclFkGH5FadbTO9q3hvPRGUak"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dashboard.dart'; 
-import 'register.dart'; 
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'dashboard.dart';
 import 'dashboard_admin.dart';
+import 'register.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -9,30 +10,39 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _userController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String _errorMessage = '';
 
-    void _login() {
-      String username = _userController.text;
-      String password = _passwordController.text;
+  final FirebaseAuth _auth = FirebaseAuth.instance; // Inisialisasi FirebaseAuth
 
-      if (username == 'admin' && password == '5678') {
+  void _login() async {
+    try {
+      // Sign-in menggunakan email dan password dari Firebase Authentication
+      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      // Periksa apakah user adalah admin berdasarkan email
+      if (userCredential.user?.email == 'admin@example.com') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => DashboardAdminScreen(username: username)),
-        );
-      } else if (username == 'user' && password == '1234') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => DashboardScreen(username: username)),
+          MaterialPageRoute(builder: (context) => DashboardAdminScreen(username: userCredential.user!.email!)),
         );
       } else {
-        setState(() {
-          _errorMessage = 'Username atau Password salah';
-        });
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => DashboardScreen(username: userCredential.user!.email!)),
+        );
       }
+    } catch (e) {
+      // Menampilkan error jika login gagal
+      setState(() {
+        _errorMessage = 'Login gagal. Periksa kembali email dan password Anda.';
+      });
     }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,8 +68,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 50),
               TextField(
-                controller: _userController,
-                decoration: InputDecoration(labelText: 'Username'),
+                controller: _emailController,
+                decoration: InputDecoration(labelText: 'Email'),
               ),
               TextField(
                 controller: _passwordController,
@@ -79,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => RegisterScreen()), // Pindah ke halaman register
+                    MaterialPageRoute(builder: (context) => RegisterScreen()), // Halaman Register
                   );
                 },
                 child: Text('Belum punya akun? Daftar di sini'),
