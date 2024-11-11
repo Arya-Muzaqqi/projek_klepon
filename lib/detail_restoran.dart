@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'pesan_meja.dart';
 
 class DetailRestoranPage extends StatelessWidget {
+  const DetailRestoranPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,10 +99,10 @@ class DetailRestoranPage extends StatelessWidget {
                     ),
                   );
                 },
-                child: Text('Reservasi Meja'),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 ),
+                child: Text('Reservasi Meja'),
               ),
             ),
           ],

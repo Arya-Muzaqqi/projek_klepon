@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'pesan_penginapan.dart'; // Pastikan untuk mengimpor halaman pesan penginapan
 
 class DetailPenginapanPage extends StatelessWidget {
+  const DetailPenginapanPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,10 +99,10 @@ class DetailPenginapanPage extends StatelessWidget {
                     ),
                   );
                 },
-                child: Text('Reservasi Sekarang'),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 ),
+                child: Text('Reservasi Sekarang'),
               ),
             ),
           ],

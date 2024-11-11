@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
-import 'login.dart';
-import 'firebase_options.dart'; // Import Firebase options (hasil dari FlutterFire CLI)
+import 'package:firebase_core/firebase_core.dart';
+import 'package:get_storage/get_storage.dart';
+import 'splash_screen.dart';
+import 'firebase_options.dart';
 
 void main() async {
   // Menjamin inisialisasi widget Flutter
@@ -9,9 +10,13 @@ void main() async {
 
   // Inisialisasi Firebase sebelum aplikasi dijalankan
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform, // Mengambil opsi berdasarkan platform
+    options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // Inisialisasi GetStorage
+  await GetStorage.init();
+
+  // Menjalankan aplikasi
   runApp(MyApp());
 }
 
@@ -24,7 +29,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginScreen(), // Mengarah ke layar login
+      home: SplashScreen(), // Mengarah ke layar splash screen
     );
   }
 }

@@ -1,139 +1,144 @@
 import 'package:flutter/material.dart';
-import 'login.dart'; // Import login.dart for logout navigation
-import 'wisata.dart'; // Import wisata.dart for the tourism screen
-import 'penginapan.dart'; // Import penginapan.dart for the accommodation screen
-import 'restoran.dart'; // Import restoran.dart for the restaurant screen
+import 'login.dart';
+import 'wisata_admin.dart';
+import 'penginapan_admin.dart';
+import 'restoran_admin.dart';
+import 'pengunjung.dart'; // Import pengunjung.dart
 
 class DashboardAdminScreen extends StatelessWidget {
-  final String username; // Receive username from LoginScreen
+  final String username;
 
-  DashboardAdminScreen({required this.username});
+  const DashboardAdminScreen({super.key, required this.username});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Dashboard Admin'),
-        centerTitle: true,
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-              icon: Icon(Icons.menu),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
+        appBar: AppBar(
+          title: Text('Dashboard Admin'),
+          centerTitle: true,
+          leading: Builder(
+            builder: (context) {
+              return IconButton(
+                icon: Icon(Icons.menu),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+              );
+            },
+          ),
         ),
-      ),
-      drawer: AdminDrawer(username: username), // Pass username to drawer
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Cari di sini',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+        drawer: AdminDrawer(username: username),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Cari di sini',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            SizedBox(height: 20),
-            // Display a placeholder for visitor count
-            Container(
-              height: 150,
-              width: double.infinity,
-              color: Color(0xFF61AB32),
-              child: Center(
-                child: Text(
-                  'Jumlah Pengunjung Hari Ini: 1250', // Example visitor count
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            // Display icons in 2x2 grid
-            Wrap(
-              spacing: 40.0, // Space between the icons horizontally
-              runSpacing: 30.0, // Space between the icons vertically
-              alignment: WrapAlignment.center,
-              children: [
-                // Icon for "Wisata"
-                Column(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.travel_explore, size: 50),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => WisataScreen()),
-                        );
-                      },
+                SizedBox(height: 20),
+                Container(
+                  height: 150,
+                  width: double.infinity,
+                  color: Color(0xFF61AB32),
+                  child: Center(
+                    child: Text(
+                      'Jumlah Pengunjung Hari Ini:',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
-                    Text('Wisata', style: TextStyle(fontSize: 16)),
-                  ],
+                  ),
                 ),
-                // Icon for "Penginapan"
-                Column(
+                SizedBox(height: 20),
+                Wrap(
+                  spacing: 40.0,
+                  runSpacing: 30.0,
+                  alignment: WrapAlignment.center,
                   children: [
-                    IconButton(
-                      icon: Icon(Icons.hotel, size: 50),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => PenginapanScreen()),
-                        );
-                      },
+                    Column(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.travel_explore, size: 50),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => WisataAdminScreen()),
+                            );
+                          },
+                        ),
+                        Text('Wisata', style: TextStyle(fontSize: 16)),
+                      ],
                     ),
-                    Text('Penginapan', style: TextStyle(fontSize: 16)),
-                  ],
-                ),
-                // Icon for "Restoran"
-                Column(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.restaurant, size: 50),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => RestoranScreen()),
-                        );
-                      },
+                    Column(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.hotel, size: 50),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      PenginapanAdminScreen()),
+                            );
+                          },
+                        ),
+                        Text('Penginapan', style: TextStyle(fontSize: 16)),
+                      ],
                     ),
-                    Text('Restoran', style: TextStyle(fontSize: 16)),
-                  ],
-                ),
-                // Icon for "Jumlah Pengunjung"
-                Column(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.people, size: 50),
-                      onPressed: () {
-                        // Stay on the same page
-                        Navigator.pop(context);
-                      },
+                    Column(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.restaurant, size: 50),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RestoranAdminScreen()),
+                            );
+                          },
+                        ),
+                        Text('Restoran', style: TextStyle(fontSize: 16)),
+                      ],
                     ),
-                    Text('Pengunjung', style: TextStyle(fontSize: 16)),
+                    Column(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.people, size: 50),
+                          onPressed: () {
+                            // Navigate to PengunjungScreen when icon is pressed
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PengunjungScreen()),
+                            );
+                          },
+                        ),
+                        Text('Pengunjung', style: TextStyle(fontSize: 16)),
+                      ],
+                    ),
                   ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 }
 
 class AdminDrawer extends StatelessWidget {
-  final String username; // Receive username from DashboardAdminScreen
+  final String username;
 
-  AdminDrawer({required this.username});
+  const AdminDrawer({super.key, required this.username});
 
   @override
   Widget build(BuildContext context) {
@@ -142,8 +147,8 @@ class AdminDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text(username), // Display username
-            accountEmail: Text("admin@example.com"),
+            accountName: Text(username),
+            accountEmail: Text("ADMIN"),
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.white,
               child: Icon(Icons.person, size: 50),
@@ -155,7 +160,7 @@ class AdminDrawer extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => WisataScreen()), // Navigate to WisataScreen
+                MaterialPageRoute(builder: (context) => WisataAdminScreen()),
               );
             },
           ),
@@ -165,7 +170,8 @@ class AdminDrawer extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => PenginapanScreen()), // Navigate to PenginapanScreen
+                MaterialPageRoute(
+                    builder: (context) => PenginapanAdminScreen()),
               );
             },
           ),
@@ -175,7 +181,7 @@ class AdminDrawer extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => RestoranScreen()), // Navigate to RestoranScreen
+                MaterialPageRoute(builder: (context) => RestoranAdminScreen()),
               );
             },
           ),
@@ -183,7 +189,10 @@ class AdminDrawer extends StatelessWidget {
             leading: Icon(Icons.people),
             title: Text('Jumlah Pengunjung'),
             onTap: () {
-              Navigator.pop(context); // Stay on current screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PengunjungScreen()),
+              );
             },
           ),
           Divider(),
@@ -193,8 +202,8 @@ class AdminDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => LoginScreen()), // Go back to login page on logout
-                (route) => false, // Remove all previous routes
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+                (route) => false,
               );
             },
           ),

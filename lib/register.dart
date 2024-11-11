@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Authentication
 import 'login.dart';
@@ -12,7 +13,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _noHPController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   String _errorMessage = '';
 
   // Fungsi untuk melakukan pendaftaran ke Firebase
@@ -24,7 +26,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String confirmPassword = _confirmPasswordController.text;
 
     // Validasi input
-    if (name.isEmpty || email.isEmpty || noHP.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (name.isEmpty ||
+        email.isEmpty ||
+        noHP.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
       setState(() {
         _errorMessage = 'Harap isi semua data';
       });
@@ -35,11 +41,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } else {
       try {
         // Daftarkan pengguna menggunakan Firebase Authentication
-        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
+        User? user = userCredential.user;
 
+        if (user != null) {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .set({
+            'uid': user.uid,
+            'name': name,
+            'email': email,
+            'NoHp': noHP,
+            'createdAt': Timestamp.now(),
+          });
+          print("User created and saved in Firestore!");
+        }
         // Setelah berhasil, arahkan pengguna ke halaman login
         Navigator.pushReplacement(
           context,
@@ -72,7 +93,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('DAFTAR', style: TextStyle(fontSize: 25, color: Colors.white)),
+        title:
+            Text('DAFTAR', style: TextStyle(fontSize: 25, color: Colors.white)),
         backgroundColor: const Color(0xFF61AB32),
         centerTitle: true,
       ),

@@ -1,199 +1,240 @@
 import 'package:flutter/material.dart';
-import 'pesan_tiket.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class RestoranScreen extends StatelessWidget {
+class Restoran {
+  final String nama;
+  final String lokasi;
+  final String nomorHp;
+  final String imageUrl; // Nama file gambar di dalam assets
+  final String deskripsi; // Tambahan deskripsi
+
+  Restoran(this.nama, this.lokasi, this.nomorHp, this.imageUrl, this.deskripsi);
+}
+
+class RestoranScreen extends StatefulWidget {
+  @override
+  _RestoranScreenState createState() => _RestoranScreenState();
+}
+
+class _RestoranScreenState extends State<RestoranScreen> {
+  List<Restoran> restoranList = [];
+  String searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRestoranData();
+  }
+
+  Future<void> fetchRestoranData() async {
+    QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection('restoran').get();
+    setState(() {
+      restoranList = snapshot.docs.map((doc) {
+        return Restoran(
+          doc['nama'],
+          doc['lokasi'],
+          doc['nomorHp'],
+          doc['imageUrl'], // Mengambil nama file gambar
+          doc['deskripsi'], // Mengambil deskripsi dari Firestore
+        );
+      }).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final filteredRestoranList = restoranList
+        .where((restoran) =>
+            restoran.nama.toLowerCase().contains(searchQuery.toLowerCase()))
+        .toList();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lokasi Restoran'),
+        title: const Text('Lokasi Restoran',
+            style: TextStyle(fontSize: 20, color: Colors.white)),
+        backgroundColor: Color.fromARGB(255, 0, 68, 255),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search, color: Colors.white),
+            onPressed: () {
+              showSearchDialog(context);
+            },
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Cari di sini',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+      backgroundColor: Color.fromARGB(255, 0, 195, 255),
+      body: restoranList.isEmpty
+          ? Center(child: CircularProgressIndicator()) // Indikator loading
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Center(
+                      child: Text(
+                        'Daftar Restoran',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
-            Text(
-              'Daftar Restoran',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                childAspectRatio: 1,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                children: List.generate(6, (index) {
-                  return GestureDetector(
-                    onTap: () {
-                      // Navigate to DetailRestoranPage when an item is tapped
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetailRestoranPage(
-                            namaRestoran: 'Restoran ${index + 1}', // Pass dynamic data
-                            alamatRestoran: 'Alamat Restoran ${index + 1}',
-                            tiketMasuk: 50000 + (index * 5000), // Example ticket price
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 1,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                    ),
+                    itemCount: filteredRestoranList.length,
+                    itemBuilder: (context, index) {
+                      final restoran = filteredRestoranList[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  DetailRestoranPage(restoran: restoran),
+                            ),
+                          );
+                        },
+                        child: Card(
+                          elevation: 2,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: ClipOval(
+                                  child: Image.asset(
+                                    restoran.imageUrl, // Menggunakan imageUrl
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Center(child: Text('Gambar tidak ditemukan'));
+                                    },
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      restoran.nama,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(restoran.lokasi),
+                                    Text('Tel: ${restoran.nomorHp}'),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       );
                     },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.restaurant, size: 50, color: Colors.grey),
-                          SizedBox(height: 8),
-                          Text(
-                            'Restoran ${index + 1}', // Dynamic text for each image
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
+                  ),
+                ],
               ),
             ),
+    );
+  }
+
+  void showSearchDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Cari Restoran'),
+          content: TextField(
+            onChanged: (value) {
+              setState(() {
+                searchQuery = value;
+              });
+            },
+            decoration: InputDecoration(hintText: "Masukkan nama restoran..."),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Tutup'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 }
 
-// Create DetailRestoranPage with dynamic data
 class DetailRestoranPage extends StatelessWidget {
-  final String namaRestoran;
-  final String alamatRestoran;
-  final int tiketMasuk;
+  final Restoran restoran;
 
-  DetailRestoranPage({
-    required this.namaRestoran,
-    required this.alamatRestoran,
-    required this.tiketMasuk,
-  });
+  DetailRestoranPage({required this.restoran});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text('Detail Restoran'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: Text(namaRestoran),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image placeholder
             Container(
               width: double.infinity,
               height: 200.0,
               color: Colors.grey[300],
-              child: Icon(Icons.restaurant, size: 100, color: Colors.grey[700]),
+              child: Image.asset(restoran.imageUrl, fit: BoxFit.cover),
             ),
             SizedBox(height: 16.0),
-
-            // Nama Restoran and Alamat Restoran
             Text(
-              namaRestoran,
+              restoran.nama,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Text(
-              alamatRestoran,
+              restoran.lokasi,
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 16.0),
-
-            // Info Restoran and Galeri Restoran buttons
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Info Restoran action
-                  },
-                  child: Text('Info Restoran'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Galeri Restoran action
-                  },
-                  child: Text('Galeri Restoran'),
-                ),
-              ],
-            ),
-            SizedBox(height: 16.0),
-
-            // Info Restoran text (as placeholder)
-            Text(
-              'Detail informasi mengenai restoran ini. Deskripsi panjang tentang restoran yang diulas...',
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 16.0),
-
-            // Ticket and price
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+                Icon(Icons.phone, color: Colors.blue),
+                SizedBox(width: 8),
                 Text(
-                  'Tiket Masuk:',
+                  'Hubungi: ${restoran.nomorHp}',
                   style: TextStyle(fontSize: 18),
                 ),
-                Text(
-                  'Rp. $tiketMasuk', // Dynamic price
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
               ],
             ),
             SizedBox(height: 16.0),
-
-            // Button to buy a ticket
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Navigate to PesanTiketPage when "Beli Tiket" button is pressed
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PesanTiketPage(
-                        destination: namaRestoran, // Send namaRestoran
-                        tiketMasuk: tiketMasuk,  // Send tiketMasuk
-                      ),
-                    ),
-                  );
-                },
-                child: Text('Beli Tiket'),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                ),
-              ),
+            Text(
+              restoran.deskripsi,
+              style: TextStyle(fontSize: 16),
             ),
           ],
         ),

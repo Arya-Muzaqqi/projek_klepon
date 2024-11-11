@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get_storage/get_storage.dart';
 import 'dashboard.dart';
 import 'dashboard_admin.dart';
+import 'penjaga.dart'; // Import the new Penjaga screen
 import 'register.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -12,32 +14,56 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final box = GetStorage();
   String _errorMessage = '';
 
-  final FirebaseAuth _auth = FirebaseAuth.instance; // Inisialisasi FirebaseAuth
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  get email => null;
 
   void _login() async {
     try {
-      // Sign-in menggunakan email dan password dari Firebase Authentication
-      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      // Sign-in using Firebase Authentication
+      final UserCredential userCredential =
+          await _auth.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // Periksa apakah user adalah admin berdasarkan email
+      // Check if the user is admin, penjaga, or a regular user based on email
       if (userCredential.user?.email == 'admin@example.com') {
+        box.write('isLoggedIn', true);
+        box.write('email', userCredential.user!.email);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => DashboardAdminScreen(username: userCredential.user!.email!)),
+          MaterialPageRoute(
+            builder: (context) =>
+                DashboardAdminScreen(username: userCredential.user!.email!),
+          ),
+        );
+      } else if (userCredential.user?.email == 'penjaga@example.com') {
+        box.write('isLoggedIn', true);
+        box.write('email', userCredential.user!.email);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                PenjagaScreen(username: userCredential.user!.email!),
+          ),
         );
       } else {
+        box.write('isLoggedIn', true);
+        box.write('email', userCredential.user!.email);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => DashboardScreen(username: userCredential.user!.email!)),
+          MaterialPageRoute(
+            builder: (context) =>
+                DashboardScreen(username: userCredential.user!.email!),
+          ),
         );
       }
     } catch (e) {
-      // Menampilkan error jika login gagal
+      // Show error if login fails
       setState(() {
         _errorMessage = 'Login gagal. Periksa kembali email dan password Anda.';
       });
@@ -49,7 +75,8 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('SELAMAT DATANG', style: TextStyle(fontSize: 25, color: Colors.white)),
+        title: Text('SELAMAT DATANG',
+            style: TextStyle(fontSize: 25, color: Colors.white)),
         backgroundColor: const Color(0xFF61AB32),
       ),
       body: Padding(
@@ -89,7 +116,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => RegisterScreen()), // Halaman Register
+                    MaterialPageRoute(
+                      builder: (context) => RegisterScreen(),
+                    ),
                   );
                 },
                 child: Text('Belum punya akun? Daftar di sini'),

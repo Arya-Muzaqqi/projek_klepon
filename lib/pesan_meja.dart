@@ -4,7 +4,7 @@ class PesanRestoranPage extends StatelessWidget {
   final String restaurant;
   final String priceRange;
 
-  PesanRestoranPage({required this.restaurant, required this.priceRange});
+  const PesanRestoranPage({super.key, required this.restaurant, required this.priceRange});
 
   @override
   Widget build(BuildContext context) {

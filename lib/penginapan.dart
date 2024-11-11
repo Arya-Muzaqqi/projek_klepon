@@ -1,98 +1,192 @@
 import 'package:flutter/material.dart';
-import 'pesan_tiket.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class PenginapanScreen extends StatelessWidget {
+class Penginapan {
+  final String nama;
+  final String lokasi;
+  final String nomorHp;
+  final String imageUrl;
+  final bool isLocalImage;
+
+  Penginapan(this.nama, this.lokasi, this.nomorHp, this.imageUrl, {this.isLocalImage = false});
+}
+
+class PenginapanScreen extends StatefulWidget {
+  @override
+  _PenginapanScreenState createState() => _PenginapanScreenState();
+}
+
+class _PenginapanScreenState extends State<PenginapanScreen> {
+  String searchQuery = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lokasi Penginapan'),
+        title: const Text('Lokasi Penginapan',
+            style: TextStyle(fontSize: 20, color: Colors.white)),
+        backgroundColor: Color.fromARGB(255, 0, 68, 255),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search, color: Colors.white),
+            onPressed: () {
+              showSearchDialog(context);
+            },
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Cari di sini',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ),
-            Text(
-              'Daftar Penginapan',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                childAspectRatio: 1,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                children: List.generate(6, (index) {
-                  return GestureDetector(
-                    onTap: () {
-                      // Navigate to DetailPenginapanPage when an item is tapped
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetailPenginapanPage(
-                            namaPenginapan: 'Penginapan ${index + 1}', // Pass dynamic data
-                            alamatPenginapan: 'Alamat Penginapan ${index + 1}',
-                            tiketMasuk: 50000 + (index * 5000), // Example ticket price
-                          ),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.image, size: 50, color: Colors.grey),
-                          SizedBox(height: 8),
-                          Text(
-                            'Penginapan ${index + 1}', // Dynamic text for each image
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                          ),
-                        ],
+      backgroundColor: Color.fromARGB(255, 0, 195, 255),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('penginapan').snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          final filteredPenginapanList = snapshot.data!.docs
+              .map((doc) => Penginapan(
+                    doc['nama'],
+                    doc['lokasi'],
+                    doc['nomorHp'],
+                    doc['imageUrl'],
+                    isLocalImage: doc['imageUrl'].startsWith('assets/'),
+                  ))
+              .where((penginapan) => penginapan.nama
+                  .toLowerCase()
+                  .contains(searchQuery.toLowerCase()))
+              .toList();
+
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Text(
+                      'Daftar Penginapan',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
                     ),
-                  );
-                }),
-              ),
+                  ),
+                ),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 1,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemCount: filteredPenginapanList.length,
+                  itemBuilder: (context, index) {
+                    final penginapan = filteredPenginapanList[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                DetailPenginapanPage(penginapan: penginapan),
+                          ),
+                        );
+                      },
+                      child: Card(
+                        elevation: 2,
+                        child: Stack(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: penginapan.isLocalImage
+                                      ? Image.asset(
+                                          penginapan.imageUrl,
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                        )
+                                      : Image.network(
+                                          penginapan.imageUrl,
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                        ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        penginapan.nama,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Text(penginapan.lokasi),
+                                      Text('Tel: ${penginapan.nomorHp}'),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void showSearchDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Cari Penginapan'),
+          content: TextField(
+            onChanged: (value) {
+              setState(() {
+                searchQuery = value;
+              });
+            },
+            decoration:
+                InputDecoration(hintText: "Masukkan nama penginapan..."),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Tutup'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 }
 
-// Create DetailPenginapanPage with dynamic data
+// Halaman detail penginapan yang menampilkan nomor HP untuk reservasi
 class DetailPenginapanPage extends StatelessWidget {
-  final String namaPenginapan;
-  final String alamatPenginapan;
-  final int tiketMasuk;
+  final Penginapan penginapan;
 
-  DetailPenginapanPage({
-    required this.namaPenginapan,
-    required this.alamatPenginapan,
-    required this.tiketMasuk,
-  });
+  DetailPenginapanPage({required this.penginapan});
 
   @override
   Widget build(BuildContext context) {
@@ -104,96 +198,49 @@ class DetailPenginapanPage extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        title: Text(namaPenginapan),
+        title: Text('Detail Penginapan'),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image placeholder
             Container(
               width: double.infinity,
               height: 200.0,
               color: Colors.grey[300],
-              child: Icon(Icons.image, size: 100, color: Colors.grey[700]),
+              child: penginapan.isLocalImage
+                  ? Image.asset(penginapan.imageUrl, fit: BoxFit.cover)
+                  : Image.network(penginapan.imageUrl, fit: BoxFit.cover),
             ),
             SizedBox(height: 16.0),
-
-            // Nama Penginapan and Alamat Penginapan
             Text(
-              namaPenginapan,
+              penginapan.nama,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Text(
-              alamatPenginapan,
+              penginapan.lokasi,
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 16.0),
-
-            // Info Penginapan and Galeri Penginapan buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Info Penginapan action
-                  },
-                  child: Text('Info Penginapan'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Galeri Penginapan action
-                  },
-                  child: Text('Galeri Penginapan'),
-                ),
-              ],
-            ),
-            SizedBox(height: 16.0),
-
-            // Info Penginapan text (as placeholder)
             Text(
-              'Detail informasi mengenai Penginapan ini. Deskripsi panjang tentang penginapan yang diulas...',
+              'Detail Penginapan:',
+              style: TextStyle(fontSize: 16),
+            ),
+            Text(
+              'Untuk Reservasi Kamar silakan hubungi nomor dibawah ini',
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 16.0),
-
-            // Ticket and price
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Icon(Icons.phone, color: Colors.blue),
+                SizedBox(width: 8),
                 Text(
-                  'Tiket Masuk:',
+                  'Hubungi: ${penginapan.nomorHp}',
                   style: TextStyle(fontSize: 18),
                 ),
-                Text(
-                  'Rp. $tiketMasuk', // Dynamic price
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
               ],
-            ),
-            SizedBox(height: 16.0),
-
-            // Button to buy a ticket
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Navigasi ke PesanTiketPage ketika tombol "Beli Tiket" ditekan
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PesanTiketPage(
-                        destination: namaPenginapan, // Mengirim namaPenginapan
-                        tiketMasuk: tiketMasuk,  // Mengirim tiketMasuk
-                      ),
-                    ),
-                  );
-                },
-                child: Text('Beli Tiket'),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                ),
-              ),
             ),
           ],
         ),
