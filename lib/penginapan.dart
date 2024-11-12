@@ -8,7 +8,8 @@ class Penginapan {
   final String imageUrl;
   final bool isLocalImage;
 
-  Penginapan(this.nama, this.lokasi, this.nomorHp, this.imageUrl, {this.isLocalImage = false});
+  Penginapan(this.nama, this.lokasi, this.nomorHp, this.imageUrl,
+      {this.isLocalImage = false});
 }
 
 class PenginapanScreen extends StatefulWidget {
@@ -183,6 +184,7 @@ class _PenginapanScreenState extends State<PenginapanScreen> {
 }
 
 // Halaman detail penginapan yang menampilkan nomor HP untuk reservasi
+
 class DetailPenginapanPage extends StatelessWidget {
   final Penginapan penginapan;
 
@@ -193,12 +195,17 @@ class DetailPenginapanPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: Text('Detail Penginapan'),
+        title: Text(
+          'Detail Penginapan',
+          style:
+              TextStyle(color: Colors.white), // Ubah warna teks menjadi putih
+        ),
+        backgroundColor: Color(0xFF61AB32), // Warna hijau pada AppBar
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),

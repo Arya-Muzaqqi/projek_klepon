@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'dashboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dashboard.dart';
 
 class KodeTiketPage extends StatelessWidget {
   final String destination;
@@ -19,20 +20,29 @@ class KodeTiketPage extends StatelessWidget {
   String _generateTicketCode() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     Random random = Random();
-    return List.generate(12, (index) => chars[random.nextInt(chars.length)])
+    return List.generate(8, (index) => chars[random.nextInt(chars.length)])
         .join();
   }
 
-  // Simpan data ke Firestore
+  // Simpan data ke Firestore hanya untuk koleksi ticket_codes
   Future<void> _saveTicketToFirestore(String ticketCode) async {
     try {
-      // Menyimpan kode tiket ke koleksi "tiket" di Firestore
-      await FirebaseFirestore.instance.collection('ticket_codes').add({
-        'ticket_code': ticketCode,
-        'destination': destination,
-        'total_harga': totalHarga,
-        'total_tickets': jumlahTiket,
-      });
+      // Ambil UID pengguna yang login
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Menyimpan data ke koleksi "ticket_codes" saja
+        await FirebaseFirestore.instance.collection('ticket_codes').add({
+          'ticket_code': ticketCode,
+          'user_id': user.uid, // Simpan user_id untuk referensi
+          'status': 'unused', // Status otomatis di-set ke 'unused'
+          'destination': destination,
+          'total_harga': totalHarga,
+          'total_tickets': jumlahTiket,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+
+        print("Ticket saved to ticket_codes collection!");
+      }
     } catch (e) {
       print("Error saving ticket: $e");
     }
@@ -41,10 +51,12 @@ class KodeTiketPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String ticketCode = _generateTicketCode();
-    _saveTicketToFirestore(ticketCode); // Simpan data tiket ke Firestore
+    _saveTicketToFirestore(
+        ticketCode); // Simpan data tiket ke Firestore hanya ke ticket_codes
 
     return Scaffold(
-      backgroundColor: Colors.green.shade400,
+      backgroundColor:
+          Color(0xFF61AB32), // Mengubah warna hijau menjadi #61AB32
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -89,7 +101,7 @@ class KodeTiketPage extends StatelessWidget {
                 },
                 child: Text('Kembali ke Beranda'),
                 style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.green.shade700,
+                    foregroundColor: Color(0xFF61AB32), // Warna hijau di tombol
                     backgroundColor: Colors.white),
               ),
             ],

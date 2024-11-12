@@ -1,52 +1,77 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'detail_tiket.dart'; // Import screen for ticket details
 
 class TiketSayaScreen extends StatelessWidget {
   final String username;
 
+  // Constructor untuk menerima username
   TiketSayaScreen({required this.username});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tiket Saya'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        title: const Text("Tiket Saya", style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xFF61AB32),
+        iconTheme:
+            IconThemeData(color: Colors.white), // Menambahkan properti ini
       ),
-      body: ListView.builder(
-        itemCount: 4, // Example with 4 tickets
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              // When the ticket is clicked, navigate to the detail page
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TiketDetailScreen(username: username),
-                ),
-              );
-            },
-            child: Card(
-              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-              child: ListTile(
-                leading: Container(
-                  width: 50,
-                  height: 50,
-                  color: Colors.grey[300],
-                  child: Icon(Icons.image, size: 40, color: Colors.grey),
-                ),
-                title: Text('Item Tiket ${index + 1}'),
-                subtitle: Text('Detail acara wisata tiket ${index + 1}'),
-                trailing: Icon(Icons.arrow_forward_ios),
-              ),
+      body: Column(
+        children: [
+          Expanded(
+            child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection(
+                      'ticket_codes') // Mengambil dari koleksi 'ticket_codes'
+                  .where('user_id',
+                      isEqualTo: FirebaseAuth.instance.currentUser!
+                          .uid) // Filter berdasarkan user_id
+                  .snapshots(),
+              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return Center(child: Text("Anda belum memesan tiket"));
+                }
+
+                return ListView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    var ticket = snapshot.data!.docs[index];
+                    return ListTile(
+                      contentPadding: EdgeInsets.symmetric(
+                          vertical: 12.0, horizontal: 16.0),
+                      title: Text(
+                        "Wisata: ${ticket['destination']}",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 8),
+                          Text("Jumlah Tiket: ${ticket['total_tickets']}",
+                              style: TextStyle(fontSize: 16)),
+                          Text("Total Harga: Rp ${ticket['total_harga']}",
+                              style: TextStyle(fontSize: 16)),
+                          Text("Status: ${ticket['status']}",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: ticket['status'] == 'used'
+                                      ? Colors.red
+                                      : Colors.green)),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

@@ -154,7 +154,7 @@ class DashboardScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => RiwayatTransaksiPage()),
+                                  builder: (context) => RiwayatTransaksiScreen()),
                             );
                           },
                         ),
@@ -263,7 +263,7 @@ class AppDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        RiwayatTransaksiPage()), // Navigate to RiwayatTransaksiScreen
+                        RiwayatTransaksiScreen()), // Navigate to RiwayatTransaksiScreen
               );
             },
           ),

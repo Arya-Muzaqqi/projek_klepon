@@ -42,8 +42,7 @@ class DetailWisataPage extends StatelessWidget {
         ),
         title: Text(
           namaWisata,
-          style:
-              TextStyle(color: Colors.white), // Warna teks judul menjadi putih
+          style: TextStyle(color: Colors.white), // Warna teks judul menjadi putih
         ),
         backgroundColor: Color(0xFF61AB32), // Background AppBar hijau
       ),
@@ -52,15 +51,12 @@ class DetailWisataPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Menampilkan gambar dari assets
             SizedBox(
               width: double.infinity,
-              height:
-                  MediaQuery.of(context).size.height * 0.3, // Responsive height
-              child: Image.asset(
-                imageUrl, // Menggunakan URL gambar yang diambil dari parameter
-                fit: BoxFit.cover,
-              ),
+              height: MediaQuery.of(context).size.height * 0.3,
+              child: imageUrl.startsWith('http')
+                  ? Image.network(imageUrl, fit: BoxFit.cover)
+                  : Image.asset(imageUrl, fit: BoxFit.cover),
             ),
             SizedBox(height: 16.0),
             Text(
@@ -83,8 +79,7 @@ class DetailWisataPage extends StatelessWidget {
                         return FutureBuilder<Map<String, dynamic>>(
                           future: fetchWisataDetails(),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
                               return AlertDialog(
                                 title: Text('Loading...'),
                                 content: CircularProgressIndicator(),
@@ -103,8 +98,7 @@ class DetailWisataPage extends StatelessWidget {
                                 ],
                               );
                             } else {
-                              String deskripsi = snapshot.data?['deskripsi'] ??
-                                  'Deskripsi tidak tersedia.';
+                              String deskripsi = snapshot.data?['deskripsi'] ?? 'Deskripsi tidak tersedia.';
                               return AlertDialog(
                                 title: Text('Deskripsi Wisata'),
                                 content: Text(deskripsi),
@@ -137,8 +131,7 @@ class DetailWisataPage extends StatelessWidget {
                         return FutureBuilder<Map<String, dynamic>>(
                           future: fetchWisataDetails(),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
                               return AlertDialog(
                                 title: Text('Loading...'),
                                 content: CircularProgressIndicator(),
@@ -157,17 +150,14 @@ class DetailWisataPage extends StatelessWidget {
                                 ],
                               );
                             } else {
-                              List<dynamic> galeri =
-                                  snapshot.data?['galeri'] ?? [];
+                              List<dynamic> galeri = snapshot.data?['galeri'] ?? [];
                               return AlertDialog(
                                 title: Text('Galeri Wisata'),
                                 content: SizedBox(
                                   width: double.maxFinite,
-                                  height: MediaQuery.of(context).size.height *
-                                      0.4, // Responsive height for gallery
+                                  height: MediaQuery.of(context).size.height * 0.4,
                                   child: GridView.builder(
-                                    gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 2,
                                       childAspectRatio: 1.0,
                                       crossAxisSpacing: 8.0,
@@ -175,27 +165,13 @@ class DetailWisataPage extends StatelessWidget {
                                     ),
                                     itemCount: galeri.length,
                                     itemBuilder: (context, index) {
-                                      // Cek apakah URL gambar berasal dari assets atau network
                                       String imagePath = galeri[index];
-                                      if (imagePath.startsWith('assets/')) {
-                                        return ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          child: Image.asset(
-                                            imagePath,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        );
-                                      } else {
-                                        return ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          child: Image.network(
-                                            imagePath,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        );
-                                      }
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(8.0),
+                                        child: imagePath.startsWith('assets/')
+                                            ? Image.asset(imagePath, fit: BoxFit.cover)
+                                            : Image.network(imagePath, fit: BoxFit.cover),
+                                      );
                                     },
                                   ),
                                 ),

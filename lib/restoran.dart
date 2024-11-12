@@ -123,7 +123,9 @@ class _RestoranScreenState extends State<RestoranScreen> {
                                     fit: BoxFit.cover,
                                     width: double.infinity,
                                     errorBuilder: (context, error, stackTrace) {
-                                      return Center(child: Text('Gambar tidak ditemukan'));
+                                      return Center(
+                                          child:
+                                              Text('Gambar tidak ditemukan'));
                                     },
                                   ),
                                 ),
@@ -192,13 +194,18 @@ class DetailRestoranPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detail Restoran'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
+        title: Text(
+          'Detail Restoran',
+          style:
+              TextStyle(color: Colors.white), // Ubah warna teks menjadi putih
+        ),
+        backgroundColor: Color(0xFF61AB32), // Warna hijau pada AppBar
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),

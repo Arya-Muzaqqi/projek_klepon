@@ -25,7 +25,9 @@ class TiketLanjutan extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Konfirmasi Tiket'),
+        iconTheme: IconThemeData(
+            color: Colors.white), // Mengubah ikon kembali menjadi putih
+        title: Text('Konfirmasi Tiket', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF61AB32),
       ),
       body: FutureBuilder<DocumentSnapshot?>(

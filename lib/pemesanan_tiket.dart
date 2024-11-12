@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'kode.dart'; // Pastikan impor ini sesuai lokasi file KodeTiketPage
+import 'kode.dart'; // Pastikan ini mengarah ke file yang sesuai
 
 class PemesananTiketScreen extends StatelessWidget {
   final String destination;
@@ -19,8 +19,15 @@ class PemesananTiketScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Detail Pemesanan"),
-        backgroundColor: Colors.green.shade400,
+        title: const Text(
+          "Detail Pemesanan",
+          style: TextStyle(
+              color: Colors.white), // Mengubah warna teks menjadi putih
+        ),
+        backgroundColor:
+            Color(0xFF61AB32), // Mengubah warna hijau menjadi #61AB32
+        iconTheme: const IconThemeData(
+            color: Colors.white), // Mengubah warna ikon menjadi putih
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -29,17 +36,24 @@ class PemesananTiketScreen extends StatelessWidget {
           children: [
             Text(
               "Destinasi: $destination",
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black), // Warna teks hitam
             ),
             const SizedBox(height: 10),
             Text(
               "Total Tiket: $totalTickets",
-              style: const TextStyle(fontSize: 16),
+              style: const TextStyle(
+                  fontSize: 16, color: Colors.black), // Warna teks hitam
             ),
             const SizedBox(height: 10),
             Text(
               "Total Harga: Rp$totalHarga",
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black), // Warna teks hitam
             ),
             const Spacer(),
             Center(
@@ -52,15 +66,16 @@ class PemesananTiketScreen extends StatelessWidget {
                       builder: (context) => KodeTiketPage(
                         destination: destination,
                         totalHarga: totalHarga,
-                        jumlahTiket:
-                            totalTickets, // Pastikan jumlahTiket disertakan
+                        jumlahTiket: totalTickets, // Kirimkan jumlah tiket
                       ),
                     ),
                   );
                 },
-                child: const Text("Konfirmasi"),
+                child: const Text("Konfirmasi",
+                    style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green.shade400,
+                  backgroundColor: Color(
+                      0xFF61AB32), // Mengubah warna tombol menjadi #61AB32
                   padding:
                       const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                   shape: RoundedRectangleBorder(
