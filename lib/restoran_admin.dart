@@ -324,7 +324,8 @@ class DetailRestoranAdminPage extends StatefulWidget {
   final Restoran restoran;
   final Function(Restoran) onUpdate;
 
-  const DetailRestoranAdminPage({super.key, required this.restoran, required this.onUpdate});
+  const DetailRestoranAdminPage(
+      {super.key, required this.restoran, required this.onUpdate});
 
   @override
   _DetailRestoranAdminPageState createState() =>

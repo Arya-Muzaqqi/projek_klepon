@@ -14,8 +14,7 @@ class TiketSayaScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Tiket Saya", style: TextStyle(color: Colors.white)),
         backgroundColor: Color(0xFF61AB32),
-        iconTheme:
-            IconThemeData(color: Colors.white), // Menambahkan properti ini
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Column(
         children: [
@@ -41,29 +40,50 @@ class TiketSayaScreen extends StatelessWidget {
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
                     var ticket = snapshot.data!.docs[index];
-                    return ListTile(
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 12.0, horizontal: 16.0),
-                      title: Text(
-                        "Wisata: ${ticket['destination']}",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                    return Card(
+                      margin:
+                          EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 8),
-                          Text("Jumlah Tiket: ${ticket['total_tickets']}",
-                              style: TextStyle(fontSize: 16)),
-                          Text("Total Harga: Rp ${ticket['total_harga']}",
-                              style: TextStyle(fontSize: 16)),
-                          Text("Status: ${ticket['status']}",
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Kode Tiket: ${ticket['ticket_code']}",
                               style: TextStyle(
-                                  fontSize: 16,
-                                  color: ticket['status'] == 'used'
-                                      ? Colors.red
-                                      : Colors.green)),
-                        ],
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blueAccent,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              "Wisata: ${ticket['destination']}",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text("Jumlah Tiket: ${ticket['total_tickets']}",
+                                style: TextStyle(fontSize: 16)),
+                            Text("Total Harga: Rp ${ticket['total_harga']}",
+                                style: TextStyle(fontSize: 16)),
+                            Text(
+                              "Status: ${ticket['status']}",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: ticket['status'] == 'used'
+                                    ? Colors.red
+                                    : Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
